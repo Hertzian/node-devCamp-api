@@ -4,10 +4,15 @@ const {
     getBotcamp,
     createBotcamp,
     deleteBotcamp,
-    updateBotcamp
+    updateBotcamp,
+    getBotcampInRadius
 } = require('../controllers/bootcamps');
 
 const router = express.Router();
+
+router
+    .route('/radius/:zipcode/:distance')
+    .get(getBotcampInRadius);
 
 router
     .route('/')
