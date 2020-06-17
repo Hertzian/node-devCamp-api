@@ -8,7 +8,19 @@ const Bootcamp = require('../models/Bootcamp');
 // @access      Public
 exports.getBotcamps = asyncHandler(async (req, res, next) => {
     // try {
-        const bootcamps = await Bootcamp.find();
+        // format for url params:
+        // ?careers[in]=Business
+        // ?faverageCost[gte]=10000&location.city=Boston
+        // console.log(req.query)// this have the url params
+
+        let query;
+        let queryStr = JSON.stringify(req.query);
+
+        queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+
+        query = Bootcamp.find(JSON.parse(queryStr))
+
+        const bootcamps = await query;
 
         res.status(200).json({success: true, count: bootcamps.length, data: bootcamps});
     // } catch (err) {
