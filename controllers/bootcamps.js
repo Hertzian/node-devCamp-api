@@ -31,7 +31,7 @@ exports.getBotcamps = asyncHandler(async (req, res, next) => {
         queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
         // Finding resource
-        query = Bootcamp.find(JSON.parse(queryStr)).populate('courses ');
+        query = Bootcamp.find(JSON.parse(queryStr)).populate('courses');
         
         // Format select fields (on mongoose docs)
         if(req.query.select){
