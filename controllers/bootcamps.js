@@ -31,7 +31,7 @@ exports.getBotcamps = asyncHandler(async (req, res, next) => {
         queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
         // Finding resource
-        query = Bootcamp.find(JSON.parse(queryStr))
+        query = Bootcamp.find(JSON.parse(queryStr)).populate('courses ');
         
         // Format select fields (on mongoose docs)
         if(req.query.select){
@@ -149,11 +149,15 @@ exports.updateBotcamp =  asyncHandler(async (req, res, next) => {
 // @access      Private
 exports.deleteBotcamp =  asyncHandler(async (req, res, next) => {
     // try {
-        const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+        // this for delete on cascade works (Bootcamp model)
+        // const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+        const bootcamp = await Bootcamp.findById(req.params.id);
     
         if(!bootcamp){
             return next(new ErrorResponse(`Bootcamp not found id of ${req.params.id}`, 404));
         }
+
+        bootcamp.remove();
     
         res.status(200).json({success: true, data: {}});
         
