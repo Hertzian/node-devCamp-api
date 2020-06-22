@@ -43,7 +43,7 @@ const CourseSchema = new mongoose.Schema({
 // Statics in mongoose are a method declare directly in the model
 // Do NOT use arrow functions for statics!
 CourseSchema.statics.getAverageCost = async function(bootcampId){
-    console.log('Calculating avg cost...'.blue);
+    // console.log('Calculating avg cost...'.blue);
 
     const obj = await this.aggregate([
         // steps to the pipeline
