@@ -19,7 +19,7 @@ const { route } = require('./courses');
 const router = express.Router();
 
 // user authorize
-const {protect} = require('../middleware/auth');
+const {protect, authorize} = require('../middleware/auth');
 
 // Re-route into other resource routers
 router.use('/:bootcampId/courses', courseRouter);
@@ -31,17 +31,19 @@ router
 
 router
     .route('/:id/photo')
-    .put(protect, bootcampPhotoUpload);
+    // important order of protect() and authorize()
+    // because authorize() uses/depend req.user from protect()
+    .put(protect, authorize('publisher', 'admin'), bootcampPhotoUpload);
 
 router
     .route('/')
     .get(advancedResults(Bootcamp, 'courses'), getBotcamps)
-    .post(protect, createBotcamp);
+    .post(protect, authorize('publisher', 'admin'), createBotcamp);
 
 router
     .route('/:id')
     .get(getBotcamp)
-    .put(protect, updateBotcamp)
-    .delete(protect, deleteBotcamp);
+    .put(protect, authorize('publisher', 'admin'), updateBotcamp)
+    .delete(protect, authorize('publisher', 'admin'), deleteBotcamp);
 
 module.exports = router;
