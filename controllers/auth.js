@@ -82,5 +82,14 @@ const sendTokenResponse = (user, statusCode, res) => {
         .status(statusCode)
         .cookie('token', token, options)
         .json({success: true, token});
-        
 }
+
+// @desc        Get currernt logged user
+// @route       GET /api/v1/auth/me
+// @access      Private
+exports.getMe = asyncHandler(async(req, res, next) => {
+    // this because in auth middleware req.user is available that uses that middleware
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({success: true, data: user});
+})
