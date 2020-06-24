@@ -1,8 +1,6 @@
 const ErrorResponse = require('../util/errorResponse');
 const asyncHandler = require('../middleware/async');
 const User = require('../models/User');
-const { model } = require('../models/User');
-const { Server } = require('http');
 
 // @desc        Register user
 // @route       POST /api/v1/auth/register
@@ -60,6 +58,37 @@ exports.login = asyncHandler(async (req, res, next) => {
     sendTokenResponse(user, 200, res);
 });
 
+// @desc        Get currernt logged user
+// @route       GET /api/v1/auth/me
+// @access      Private
+exports.getMe = asyncHandler(async(req, res, next) => {
+    // this because in auth middleware req.user is available that uses that middleware
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({success: true, data: user});
+});
+
+// @desc        Forgot password
+// @route       GET /api/v1/auth/forgotpassword
+// @access      Public
+exports.forgotPassword = asyncHandler(async(req, res, next) => {
+    // this because in auth middleware req.user is available that uses that middleware
+    const user = await User.findOne({email: req.body.email});
+
+    if(!user){
+        return next(new ErrorResponse('There is no user with that email', 404))
+    }
+
+    // Get reset token, getResetPasswordToken() comes from user model
+    const resetToken = user.getResetPasswordToken();
+
+    // console.log(resetToken);
+
+    await user.save({validateBeforeSave: false});
+
+    res.status(200).json({success: true, data: user});
+});
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
     // Create token
@@ -83,13 +112,3 @@ const sendTokenResponse = (user, statusCode, res) => {
         .cookie('token', token, options)
         .json({success: true, token});
 }
-
-// @desc        Get currernt logged user
-// @route       GET /api/v1/auth/me
-// @access      Private
-exports.getMe = asyncHandler(async(req, res, next) => {
-    // this because in auth middleware req.user is available that uses that middleware
-    const user = await User.findById(req.user.id);
-
-    res.status(200).json({success: true, data: user});
-})
