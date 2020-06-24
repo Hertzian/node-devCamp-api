@@ -58,4 +58,4 @@ process.on('unhandledRejection', (err, promise) => {
     console.log(`Error: ${err.message}`.red);
     // Close server & exit process (exit with failure, passed 1 for param)
     server.close(() => process.exit(1));
-})
+});
