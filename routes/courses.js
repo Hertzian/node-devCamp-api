@@ -8,11 +8,12 @@ const {
 } = require('../controllers/courses');
 
 const Course = require('../models/Course');
-const advancedResults = require('../middleware/advancedResults');
 
 // merge the url params of the resource routes
 const router = express.Router({mergeParams: true});
 
+// pagination & advanced filtering
+const advancedResults = require('../middleware/advancedResults');
 // user authorize
 const {protect, authorize} = require('../middleware/auth');
 
