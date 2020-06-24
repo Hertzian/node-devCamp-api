@@ -81,14 +81,23 @@ exports.createBotcamp =  asyncHandler(async (req, res, next) => {
 // @access      Private
 exports.updateBotcamp =  asyncHandler(async (req, res, next) => {
     // try {
-        const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        });
+        // get bootcamp by id
+        let bootcamp = await Bootcamp.findById(req.params.id);
     
         if(!bootcamp){
             return next(new ErrorResponse(`Bootcamp not found id of ${req.params.id}`, 404));
         }
+
+        // Make sure user is bootcamp owner to modify
+        if(bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin'){
+            return next(new ErrorResponse(`User ${req.params.id} is not authorized to update this bootcamp`, 401));
+        }
+
+        // Update bootcamp
+        bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+            new: true, // return updated bootcamp
+            runValidators: true
+        });
     
         res.status(200).json({success: true, data: bootcamp});
         
@@ -108,6 +117,11 @@ exports.deleteBotcamp =  asyncHandler(async (req, res, next) => {
     
         if(!bootcamp){
             return next(new ErrorResponse(`Bootcamp not found id of ${req.params.id}`, 404));
+        }
+
+        // Make sure user is bootcamp owner to modify
+        if(bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin'){
+            return next(new ErrorResponse(`User ${req.params.id} is not authorized to delete this bootcamp`, 401));
         }
 
         bootcamp.remove();
@@ -155,6 +169,11 @@ exports.bootcampPhotoUpload =  asyncHandler(async (req, res, next) => {
     if(!bootcamp){
         return next(new ErrorResponse(`Bootcamp not found id of ${req.params.id}`, 404));
     }
+
+    // Make sure user is bootcamp owner to modify
+    if(bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin'){
+        return next(new ErrorResponse(`User ${req.params.id} is not authorized to update this bootcamp`, 401));
+    }
     
     if(!req.files){
         return next(new ErrorResponse(`Please upload a file`, 400));
@@ -190,7 +209,6 @@ exports.bootcampPhotoUpload =  asyncHandler(async (req, res, next) => {
             data: file.name
         });
     });
-
     // console.log(file.name)
 
 });
