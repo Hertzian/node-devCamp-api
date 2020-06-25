@@ -2,8 +2,6 @@ const ErrorResponse = require('../util/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Course = require('../models/Course');
 const Bootcamp = require('../models/Bootcamp');
-const advancedResults = require('../middleware/advancedResults');
-const { route } = require('../routes/courses');
 
 // @desc        Get all courses
 // @route       GET /api/v1/courses
@@ -34,7 +32,7 @@ exports.getCourse = asyncHandler(async (req, res, next) =>{
     });
 
     if(!course){
-        return next(new ErrorResponse(`No course with the id of ${req.params.id}`), 404);
+        return next(new ErrorResponse(`No course with the id of ${req.params.id}`, 404));
     }
 
     res.status(200).json({
